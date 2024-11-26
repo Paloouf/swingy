@@ -1,0 +1,69 @@
+@startuml
+
+' Define Packages
+package "Model" {
+    class Hero {
+        - String name
+        - int health
+        - int attackPower
+        - int defense
+        + void levelUp()
+        + void takeDamage(int damage)
+    }
+    class Enemy {
+        - String type
+        - int health
+        - int attackPower
+        + void attack(Hero hero)
+    }
+    class Map {
+        - int width
+        - int height
+        - String[][] grid
+        + void loadMap(String mapFile)
+        + void displayMap()
+    }
+    class Stats {
+        - int level
+        - int experience
+        - int gold
+        + void addExperience(int exp)
+        + void addGold(int amount)
+    }
+}
+
+package "View" {
+    abstract class View {
+        + void display(String message)
+    }
+    class CLIView extends View {
+        + void display(String message)
+    }
+    class GUIView extends View {
+        + void render(String message)
+    }
+}
+
+package "Controller" {
+    class GameController {
+        - Hero hero
+        - Map map
+        - View view
+        + void startGame()
+        + void handleInput(String input)
+        + void updateView()
+    }
+}
+
+' Define Relationships
+Hero --> Stats : "has"
+Hero --> Map : "interacts with"
+GameController --> Hero
+GameController --> Map
+GameController --> View
+View <|-- CLIView
+View <|-- GUIView
+Enemy --> Hero : "attacks"
+Map --> Enemy : "contains"
+
+@enduml

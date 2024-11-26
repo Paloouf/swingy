@@ -1,3 +1,6 @@
+package swingy;
+
+import swingy.view.GUIView;
 
 public class Main {
 
@@ -8,7 +11,7 @@ public class Main {
 
     public static void main(String args[])
     {
-        // SwingyGame game;
+        SwingyGame game;
 
         // // some initialisations
         // BasicConfigurator.configure();
@@ -20,14 +23,14 @@ public class Main {
             usage();
             System.exit(1);
         }
-        else{
-            System.out.println("We startin'");
+        else{  
+            game = new SwingyGame("save.txt", args[0]);
+            game.start();
         }
 
         // try
         // {
-        //     game = new SwingyGame("save.txt", args[0]);
-        //     game.start();
+
         // }
         // catch (InvalidDisplayModeException e)
         // {
