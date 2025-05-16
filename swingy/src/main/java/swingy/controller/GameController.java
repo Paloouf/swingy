@@ -46,7 +46,7 @@ public class GameController implements InputContext{
                     break;
     
                 case CREATE_HERO:
-                    hero = view.createHero();
+                    hero = view.createHero(); //this needs to have a inputmanager thing same as the menudisplay
                     if (hero != null) {
                         map = new Map(hero.getLevel());
                         state = GameState.MAP;
@@ -68,9 +68,9 @@ public class GameController implements InputContext{
                 case MAP:
                     view.MapDisplay(map, hero); // Display the map and hero state
                     String input = view.getMoveInput(); // Handle movement input
-                    if (processMovement(input)) {
-                        state = GameState.EXIT; // Hero wins by reaching the map edge
-                    }
+                     if (processMovement(input)) {
+                         state = GameState.EXIT; // Hero wins by reaching the map edge
+                     }
                     break;
     
                 default:
@@ -91,7 +91,7 @@ public class GameController implements InputContext{
                 System.out.println("Invalid input!");
                 return false;
         }
-    
+        
         boolean reachedEdge = map.moveHero(direction);
         if (reachedEdge) {
             System.out.println("You reached the edge of the map! Victory!");
