@@ -3,13 +3,12 @@ package swingy.view;
 import java.util.Scanner;
 
 import swingy.controller.InputManager;
+import swingy.model.Hero;
+import swingy.model.Map;
 import swingy.view.console.ConsoleMap;
 import swingy.view.console.ConsoleMenu;
 import swingy.view.console.HeroMenu;
 import swingy.view.console.MenuAction;
-import swingy.model.Hero;
-import swingy.model.HeroClass;
-import swingy.model.Map;
 
 public class CLIView extends View{
 	private ConsoleMenu console;
@@ -47,8 +46,6 @@ public class CLIView extends View{
 
 	@Override
 	public Hero createHero(){
-		InputManager.setContext(heroMenu);
-		InputManager.startInputLoop();
 		return heroMenu.createHero();
 	}
 	

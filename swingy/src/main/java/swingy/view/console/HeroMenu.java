@@ -1,10 +1,19 @@
 package swingy.view.console;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
+import swingy.controller.InputContext;
+import swingy.controller.InputValidator;
 import swingy.model.Hero;
 import swingy.model.HeroClass;
-import swingy.controller.InputContext;
 
 public class HeroMenu implements InputContext{
     private static final String TITLE = """
@@ -30,22 +39,86 @@ public class HeroMenu implements InputContext{
 
     private MenuAction lastAction = MenuAction.NONE;
 	private static int selectedOption = 0;
+    private static final String SAVE_FOLDER = "saves";
+
 
 	public Hero createHero() {
         Scanner scanner = new Scanner(System.in);
         clearScreen();
         System.out.println("Enter your hero's name:");
-        String name = scanner.nextLine().trim();
+        String name = InputValidator.validateStringInput(scanner.nextLine()); //problem tidingtiding engine kaput
         HeroClass selectedClass = selectHeroClass();
-        return new Hero(name, selectedClass);
+
+        Hero newHero = new Hero(name, selectedClass);
+        saveHero(newHero);
+        return newHero;
     }
 
     public Hero selectSave() {
         clearScreen();
+
+        List<Path> saves = getSaveFiles();
+        if (saves.isEmpty()) {
+            System.out.println("No saved heroes found!");
+            return null;
+        }
+
         System.out.println("Select a saved hero:");
-        HeroClass selectedClass = selectHeroClass(); // Add logic to load saved heroes if applicable
-        return new Hero("name", selectedClass); // Replace with actual save logic
+        for (int i = 0; i < saves.size(); i++) {
+            System.out.printf("[%d] %s\n", i + 1, saves.get(i).getFileName().toString());
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        int choice = -1;
+        while (choice < 1 || choice > saves.size()) {
+            System.out.print("Enter a number: ");
+            choice = scanner.nextInt();
+        }
+
+        return loadHero(saves.get(choice - 1));
     }
+
+    private void saveHero(Hero hero) {
+        try {
+            Files.createDirectories(Paths.get(SAVE_FOLDER));
+            String fileName = SAVE_FOLDER + "/" + hero.getName() + ".json";
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+                writer.write(hero.toJSON());
+            }
+
+            System.out.println("Hero saved successfully!");
+        } catch (IOException e) {
+            System.err.println("Error saving hero: " + e.getMessage());
+        }
+    }
+
+    private Hero loadHero(Path saveFile) {
+        try {
+            String json = Files.readString(saveFile);
+            return Hero.fromJSON(json);
+        } catch (IOException e) {
+            System.err.println("Error loading hero: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private List<Path> getSaveFiles() {
+        try {
+            Path folder = Paths.get(SAVE_FOLDER);
+            if (!Files.exists(folder)) {
+                return Collections.emptyList();
+            }
+
+            return Files.list(folder)
+                        .filter(file -> file.toString().endsWith(".json"))
+                        .toList();
+        } catch (IOException e) {
+            System.err.println("Error retrieving save files: " + e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
 
     private HeroClass selectHeroClass() {
         HeroClass[] classes = HeroClass.values();

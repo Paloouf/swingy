@@ -13,16 +13,20 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.2.0.Final</version>
+            <version>9.0.0.Final</version>
         </dependency>
         
         <!-- EL (Expression Language) API for Hibernate -->
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.0</version>
+       <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+            <version>6.0.0-M1</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-cdi</artifactId>
+            <version>9.0.0.Final</version>
+        </dependency>
         <!-- JLine for advanced console input -->
         <dependency>
             <groupId>org.jline</groupId>

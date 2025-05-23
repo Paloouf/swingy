@@ -1,15 +1,9 @@
 package swingy.controller;
 
-import java.util.Scanner;
-
 import swingy.model.Hero;
 import swingy.model.Map;
 import swingy.view.View;
-import swingy.view.console.ConsoleMenu;
 import swingy.view.console.MenuAction;
-
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
 
 public class GameController implements InputContext{
 	public boolean isRunning;
@@ -48,7 +42,7 @@ public class GameController implements InputContext{
                 case CREATE_HERO:
                     hero = view.createHero(); //this needs to have a inputmanager thing same as the menudisplay
                     if (hero != null) {
-                        map = new Map(hero.getLevel());
+                        map = new Map(hero);
                         state = GameState.MAP;
                     } else {
                         state = GameState.MENU; // Go back to menu if hero creation fails
@@ -58,7 +52,7 @@ public class GameController implements InputContext{
                 case LOAD_SAVE:
                     hero = view.selectSave();
                     if (hero != null) {
-                        map = new Map(hero.getLevel());
+                        map = new Map(hero);
                         state = GameState.MAP;
                     } else {
                         state = GameState.MENU; // Go back to menu if loading fails
@@ -69,7 +63,7 @@ public class GameController implements InputContext{
                     view.MapDisplay(map, hero); // Display the map and hero state
                     String input = view.getMoveInput(); // Handle movement input
                      if (processMovement(input)) {
-                         state = GameState.EXIT; // Hero wins by reaching the map edge
+                         //state = GameState.EXIT; // Hero wins by reaching the map edge
                      }
                     break;
     
@@ -94,7 +88,7 @@ public class GameController implements InputContext{
         
         boolean reachedEdge = map.moveHero(direction);
         if (reachedEdge) {
-            System.out.println("You reached the edge of the map! Victory!");
+            map.generateNewMap();
         }
         return reachedEdge;
     }

@@ -1,7 +1,5 @@
 package swingy.model;
 
-import swingy.model.Hero;
-
 public class Enemy {
 	private String name;
 	private int defense;
@@ -17,5 +15,23 @@ public class Enemy {
 		this.health = health;
 	}
 
-	public void attack(Hero hero){}
+	 // Method to simulate taking damage
+    public void takeDamage(int damage) {
+        int effectiveDamage = Math.max(0, damage - defense); // Reduce damage by defense
+        this.health = Math.max(0, this.health - effectiveDamage); // Ensure health doesn't drop below zero
+        System.out.println(name + " takes " + effectiveDamage + " damage. Health: " + this.health);
+    }
+
+    // Getters for the fields
+    public int getHealth() {
+        return this.health;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getAttackPower() {
+        return this.attackPower;
+    }
 }

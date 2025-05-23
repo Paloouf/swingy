@@ -2,17 +2,21 @@ package swingy.model;
 
 import java.util.Random;
 
+import swingy.view.console.FightMenu;
+
 public class Map {
     private int size;
     private int heroX;
     private int heroY;
     private char[][] grid; // The visible grid
     private boolean[][] enemies; // Tracks enemy positions
+    private Hero heroMap;
 
-    public Map(int heroLevel) {
-        size = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
+    public Map(Hero hero) {
+        size = (hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2);
         grid = new char[size][size];
         enemies = new boolean[size][size];
+        heroMap = hero;
         heroX = size / 2;
         heroY = size / 2;
         generateMap();
@@ -31,6 +35,28 @@ public class Map {
             } while (enemies[x][y] || (x == heroX && y == heroY)); // Avoid placing on the hero's position
             enemies[x][y] = true; // Mark position as an enemy
         }
+    }
+
+    public void generateNewMap() {
+        Random rand = new Random();
+        // Reset all values in the enemies array to false
+        for (boolean[] enemie : enemies) {
+            for (int j = 0; j < enemie.length; j++) {
+                enemie[j] = false;
+            }
+        }
+        int numberOfEnemies = size / 2; // Example value
+        for (int i = 0; i < numberOfEnemies; i++) {
+            int x, y;
+            do {
+                x = rand.nextInt(size);
+                y = rand.nextInt(size);
+            } while (enemies[x][y] || (x == heroX && y == heroY)); // Avoid placing on the hero's position
+            enemies[x][y] = true; // Mark position as an enemy
+        }
+        heroX = size/2;
+        heroY = size/2;
+        updateGrid();
     }
 
     // Update the grid with hero and enemies
@@ -73,6 +99,15 @@ public class Map {
         // Update hero's position
         heroX = newX;
         heroY = newY;
+
+
+        if (grid[heroX][heroY] == 'V') {
+            System.out.println("You've encountered something!");
+            FightMenu fightMenu = new FightMenu();
+            fightMenu.initiateFight(heroMap);
+            // After fight, optionally clear the V case
+            enemies[heroX][heroY] = false;
+        }
 
         // Refresh the grid to reflect the new hero position
         updateGrid();
