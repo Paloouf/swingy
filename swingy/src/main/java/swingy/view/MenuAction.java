@@ -1,4 +1,4 @@
-package swingy.view.console;
+package swingy.view;
 
 public enum MenuAction {
 	NEW_GAME,

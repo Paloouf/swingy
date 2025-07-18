@@ -6,6 +6,7 @@ public enum GameState {
 		LOAD_SAVE,
 		MAP,
 		COMBAT,
+		DIED,
 		EXIT
 }
 

@@ -1,6 +1,7 @@
 package swingy.view.console;
 
 import swingy.controller.InputContext;
+import swingy.view.MenuAction;
 
 public class ConsoleMenu implements InputContext{
 	private static final String TITLE = """

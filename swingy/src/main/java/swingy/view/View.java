@@ -1,8 +1,8 @@
 package swingy.view;
 
-import swingy.model.Map;
-import swingy.view.console.MenuAction;
+import swingy.controller.GameStateManager;
 import swingy.model.Hero;
+import swingy.model.Map;
 
 public abstract class View {
 	private Map map;
@@ -12,7 +12,7 @@ public abstract class View {
 	}
 
 	public abstract String getMoveInput();
-	public abstract void MenuDisplay();
+	public abstract void MenuDisplay(GameStateManager stateManager);
 	public abstract MenuAction getMenuChoice();
 	public abstract Hero createHero();
 	public abstract Hero selectSave();

@@ -18,7 +18,7 @@ public class ConsoleMap {
     }
 
     private void displayHeroInfo(Hero hero) {
-        System.out.println("Hero: " + hero.getName() + " | Level: " + hero.getLevel());
+        System.out.println("Hero: " + hero.getName() + " | Level: " + hero.getLevel() + " | HP: " + hero.getHealth() + " | Att: " + hero.getAttackPower() + " | XP: " + hero.getExperience());
     }
 
     private void displayControls() {

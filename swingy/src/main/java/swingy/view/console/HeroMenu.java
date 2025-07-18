@@ -1,7 +1,5 @@
 package swingy.view.console;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +12,7 @@ import swingy.controller.InputContext;
 import swingy.controller.InputValidator;
 import swingy.model.Hero;
 import swingy.model.HeroClass;
+import swingy.view.MenuAction;
 
 public class HeroMenu implements InputContext{
     private static final String TITLE = """
@@ -45,12 +44,23 @@ public class HeroMenu implements InputContext{
 	public Hero createHero() {
         Scanner scanner = new Scanner(System.in);
         clearScreen();
-        System.out.println("Enter your hero's name:");
-        String name = InputValidator.validateStringInput(scanner.nextLine()); //problem tidingtiding engine kaput
+        //System.out.println("Enter your hero's name:");
+        //String input = scanner.nextLine();
+        String name;// = InputValidator.validateStringInput(input); //problem tidingtiding engine kaput
+        while (true) {
+            System.out.print("Enter your hero's name:");
+            String input = scanner.nextLine();
+
+            name = InputValidator.validateStringInput(input);
+            if (name != null) {
+                System.out.println("Valid input: " + name);
+                break;
+            }
+        }
         HeroClass selectedClass = selectHeroClass();
 
         Hero newHero = new Hero(name, selectedClass);
-        saveHero(newHero);
+        newHero.saveHero();
         return newHero;
     }
 
@@ -76,21 +86,6 @@ public class HeroMenu implements InputContext{
         }
 
         return loadHero(saves.get(choice - 1));
-    }
-
-    private void saveHero(Hero hero) {
-        try {
-            Files.createDirectories(Paths.get(SAVE_FOLDER));
-            String fileName = SAVE_FOLDER + "/" + hero.getName() + ".json";
-
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-                writer.write(hero.toJSON());
-            }
-
-            System.out.println("Hero saved successfully!");
-        } catch (IOException e) {
-            System.err.println("Error saving hero: " + e.getMessage());
-        }
     }
 
     private Hero loadHero(Path saveFile) {

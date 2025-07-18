@@ -2,21 +2,15 @@ package swingy.view;
 
 import java.util.Scanner;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import swingy.controller.InputManager;
+import swingy.controller.GameStateManager;
 import swingy.model.Hero;
 import swingy.model.HeroClass;
-import swingy.view.gui.GUIMenu;
-import swingy.view.console.MenuAction;
 import swingy.model.Map;
+import swingy.view.gui.GUIMenu;
 
 public class GUIView extends View{
 	private GUIMenu gui;
+    private static GameStateManager stateManager;
 	//private Scanner scanner = new Scanner(System.in);
 
     public GUIView() {
@@ -24,10 +18,10 @@ public class GUIView extends View{
     }
 
 	@Override
-    public void MenuDisplay() {
-		InputManager.setContext(gui);
-        gui.launchGUI(); // Delegate to GUIMenu
-		InputManager.startInputLoop();
+    public void MenuDisplay(GameStateManager stateManager) {
+        GUIMenu.setSharedStateManager(stateManager);
+        if (!GUIMenu.isGuiLaunched)
+            GUIMenu.launchGUI();
     }
 
     @Override
@@ -43,19 +37,12 @@ public class GUIView extends View{
 
 	@Override
 	public Hero createHero(){
-		System.out.println("Enter your hero's name:");
-        //String name = scanner.nextLine();
-
-        HeroClass selectedClass = selectHeroClass();
-        return new Hero("name", selectedClass);
+        return gui.createHero();
 	}
+
 	@Override
 	public Hero selectSave(){
-		System.out.println("Enter your hero's name:");
-       // String name = scanner.nextLine();
-
-        HeroClass selectedClass = selectHeroClass();
-        return new Hero("name", selectedClass);
+		return gui.selectSave();
 	}
 
 	private HeroClass selectHeroClass() {

@@ -1,15 +1,18 @@
 package swingy.view.console;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import swingy.controller.InputValidator;
+import swingy.model.Artifact;
 import swingy.model.Enemy;
 import swingy.model.Hero;
+import swingy.model.LootSystem;
 
 public class FightMenu {
 
     public void initiateFight(Hero hero) {
-        Enemy enemy = createEnemy(hero);
+		Enemy enemy = Enemy.createEnemy(hero);
         System.out.println("You encountered a " + enemy.getName() + "!");
 
         Scanner scanner = new Scanner(System.in);
@@ -37,7 +40,9 @@ public class FightMenu {
 						}
 					}
 					case 2 -> {
-						System.out.println("You fled from the " + enemy.getName() + ".");
+						flight(hero, enemy);
+						System.out.println("Press enter to continue...");
+						String waitforenter = scanner.nextLine();
 						fightOngoing = false; // Exit the fight
 					}
 					default -> System.out.println("Invalid choice. Please try again.");
@@ -48,15 +53,33 @@ public class FightMenu {
         }
     }
 
-    private Enemy createEnemy(Hero hero) {
-        // Create an enemy based on the hero's level or other logic
-        String enemyName = "Goblin"; // Example name
-        int level = hero.getLevel();
-        int attack = level * 2; // Example formula
-        int defense = level;   // Example formula
-        int health = level * 100; // Example formula
-        return new Enemy(enemyName, level, attack, defense, health);
-    }
+	private void flight(Hero hero, Enemy enemy) {
+		Random random = new Random();
+		boolean successfulEscape = random.nextBoolean(); // Simulates a 50/50 chance
+		
+		if (successfulEscape) {
+			System.out.println("You successfully fled from the " + enemy.getName() + "!");
+			
+			// Move the hero back to the previous position
+			int previousX = hero.getPreviousX();
+			int previousY = hero.getPreviousY();
+			hero.setPosition(previousX, previousY); // Assume your Hero class has methods to set position
+		} else {
+			System.out.println("You failed to escape! The " + enemy.getName() + " blocks your path.");
+			System.out.println("Prepare to fight!");
+			fight(hero,enemy);
+		}
+	}
+
+    // private Enemy createEnemy(Hero hero) {
+    //     // Create an enemy based on the hero's level or other logic
+    //     String enemyName = "Goblin"; // Example name
+    //     int level = hero.getLevel();
+    //     int attack = level * 2; // Example formula
+    //     int defense = level;   // Example formula
+    //     int health = level * 10; // Example formula
+    //     return new Enemy(enemyName, level, attack, defense, health);
+    // }
 
     private void fight(Hero hero, Enemy enemy) {
 		System.out.println("\n--- Combat Begins ---");
@@ -70,13 +93,22 @@ public class FightMenu {
 				System.out.println("\nYou attack the " + enemy.getName() + "!");
 				enemy.takeDamage(hero.getAttackPower());
 				System.out.println("The " + enemy.getName() + "'s health: " + enemy.getHealth());
-				Thread.sleep(1000); // Pause for 1 second to show the attack
+				Thread.sleep(300); // Pause for 1 second to show the attack
 
 				// Check if enemy is defeated
 				if (enemy.getHealth() <= 0) {
 					System.out.println("The " + enemy.getName() + " has been defeated!");
+					int xpAward = (int) Math.pow(enemy.getLevel(), 2) * 300;
+					hero.gainExperience(xpAward);
+					hero.heal();
+					Artifact loot = LootSystem.rollForLoot(); // to implement 
+					if (loot != null) {
+						hero.equipArtifact(loot);
+						System.out.println("You equipped the " + loot + "!");
+					}
+					System.out.println("Press Enter to continue...");
 					String input = scanner.nextLine();
-					if (input == "\r") // fix this shit its sloppy
+					if (input.trim().isEmpty())
 						inCombat = false; // Exit the combat loop
 					break;
 				}
@@ -85,7 +117,7 @@ public class FightMenu {
 				System.out.println("\nThe " + enemy.getName() + " attacks you!");
 				hero.takeDamage(enemy.getAttackPower());
 				System.out.println("Your health: " + hero.getHealth());
-				Thread.sleep(1000); // Pause for 1 second to show the attack
+				Thread.sleep(300); // Pause for 1 second to show the attack
 
 				// Check if hero is defeated
 				if (hero.getHealth() <= 0) {

@@ -10,52 +10,62 @@ public class Map {
     private int heroY;
     private char[][] grid; // The visible grid
     private boolean[][] enemies; // Tracks enemy positions
-    private Hero heroMap;
+    private Hero hero;
 
-    public Map(Hero hero) {
-        size = (hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2);
+    public Map(Hero heroMap) {
+        System.out.println("map created with hero");
+        size = (heroMap.getLevel() - 1) * 5 + 10 - (heroMap.getLevel() % 2);
         grid = new char[size][size];
         enemies = new boolean[size][size];
-        heroMap = hero;
-        heroX = size / 2;
-        heroY = size / 2;
+        hero = heroMap;
+        hero.setX(size/2);
+        hero.setY(size/2);
         generateMap();
         updateGrid();
+    }
+
+    public interface EncounterListener {
+        void onEnemyEncountered(Hero hero);
+    }
+
+    private EncounterListener encounterListener;
+
+    public void setEncounterListener(EncounterListener listener) {
+        this.encounterListener = listener;
     }
 
     // Generate enemies and place them on the map
     public void generateMap() {
         Random rand = new Random();
-        int numberOfEnemies = size / 2; // Example value
+        int numberOfEnemies = size; // Example value
         for (int i = 0; i < numberOfEnemies; i++) {
             int x, y;
             do {
                 x = rand.nextInt(size);
                 y = rand.nextInt(size);
-            } while (enemies[x][y] || (x == heroX && y == heroY)); // Avoid placing on the hero's position
+            } while (enemies[x][y] || (x == hero.getX() && y == hero.getY())); // Avoid placing on the hero's position
             enemies[x][y] = true; // Mark position as an enemy
         }
     }
 
     public void generateNewMap() {
+        size = (hero.getLevel() - 1) * 5 + 10 - (hero.getLevel() % 2);
         Random rand = new Random();
         // Reset all values in the enemies array to false
-        for (boolean[] enemie : enemies) {
-            for (int j = 0; j < enemie.length; j++) {
-                enemie[j] = false;
-            }
-        }
-        int numberOfEnemies = size / 2; // Example value
+        enemies = new boolean[size][size];
+        grid = new char[size][size];
+        int numberOfEnemies = size; // Example value
+        hero.setX(size/2);
+        hero.setY(size/2);
         for (int i = 0; i < numberOfEnemies; i++) {
             int x, y;
             do {
                 x = rand.nextInt(size);
                 y = rand.nextInt(size);
-            } while (enemies[x][y] || (x == heroX && y == heroY)); // Avoid placing on the hero's position
+            } while (enemies[x][y] || (x == hero.getX() && y == hero.getY())); // Avoid placing on the hero's position
             enemies[x][y] = true; // Mark position as an enemy
         }
-        heroX = size/2;
-        heroY = size/2;
+        
         updateGrid();
     }
 
@@ -71,7 +81,7 @@ public class Map {
             }
         }
         // Place the hero
-        grid[heroX][heroY] = 'H';
+        grid[hero.getX()][hero.getY()] = 'H';
     }
 
     // Check if a villain is at the specified position
@@ -80,9 +90,9 @@ public class Map {
     }
 
     // Move the hero and handle bounds checking
-    public boolean moveHero(String direction) {
-        int newX = heroX;
-        int newY = heroY;
+    public boolean moveHero(String direction, boolean gui) {
+        int newX = hero.getX();
+        int newY = hero.getY();
 
         switch (direction.toLowerCase()) {
             case "north": newX--; break;
@@ -93,20 +103,30 @@ public class Map {
 
         // Check if hero is at the edge of the map
         if (newX < 0 || newX >= size || newY < 0 || newY >= size) {
+            generateNewMap();
             return true; // Reached the edge (victory)
         }
-
+        hero.setPreviousX(hero.getX());
+        hero.setPreviousY(hero.getY());
         // Update hero's position
-        heroX = newX;
-        heroY = newY;
+        hero.setX(newX);
+        hero.setY(newY);
+        
 
-
-        if (grid[heroX][heroY] == 'V') {
-            System.out.println("You've encountered something!");
-            FightMenu fightMenu = new FightMenu();
-            fightMenu.initiateFight(heroMap);
+        if (grid[hero.getX()][hero.getY()] == 'V') {
+            System.out.println("You've encountered something!"); //gui crashes here
+            if (!gui){
+                FightMenu fightMenu = new FightMenu();
+                fightMenu.initiateFight(hero);
+            }
+            else {
+                System.out.println("enemy gui ok");
+                if (encounterListener != null) {
+                    encounterListener.onEnemyEncountered(hero); // Notify listener
+                }
+            }
             // After fight, optionally clear the V case
-            enemies[heroX][heroY] = false;
+            enemies[hero.getX()][hero.getY()] = false;
         }
 
         // Refresh the grid to reflect the new hero position

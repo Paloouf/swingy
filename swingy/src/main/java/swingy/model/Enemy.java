@@ -15,6 +15,15 @@ public class Enemy {
 		this.health = health;
 	}
 
+    public static Enemy createEnemy(Hero hero) {
+        // Create an enemy based on the hero's level or other logic
+        String enemyName = "Goblin"; // Example name
+        int level = hero.getLevel();
+        int attack = level * 2; // Example formula
+        int defense = level;   // Example formula
+        int health = level * 10; // Example formula
+        return new Enemy(enemyName, level, attack, defense, health);
+    }
 	 // Method to simulate taking damage
     public void takeDamage(int damage) {
         int effectiveDamage = Math.max(0, damage - defense); // Reduce damage by defense
@@ -22,6 +31,12 @@ public class Enemy {
         System.out.println(name + " takes " + effectiveDamage + " damage. Health: " + this.health);
     }
 
+    public int getMaxHealth(){
+        return health;
+    }
+    public int getLevel(){
+        return level;
+    }
     // Getters for the fields
     public int getHealth() {
         return this.health;

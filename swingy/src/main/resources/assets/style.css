@@ -1,0 +1,79 @@
+.root {
+    -fx-background-color: #f0f0f0;
+}
+.map-grid {
+    -fx-border-color: #333;
+    -fx-border-width: 2;
+}
+.button {
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+}
+
+.arrow-up {
+    -fx-shape: "M 0 15 L 15 0 L 30 15 Z";
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+}
+.arrow-down {
+    -fx-shape: "M 0 0 L 15 15 L 30 0 Z";
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+}
+.arrow-left {
+    -fx-shape: "M 15 0 L 0 15 L 15 30 Z";
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+}
+.arrow-right {
+    -fx-shape: "M 0 0 L 15 15 L 0 30 Z";
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: #252525;
+    -fx-text-fill: white;
+}
+
+/* Style for the hero info container */
+.hero-info {
+    -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); /* Dark gradient background */
+    -fx-background-radius: 10; /* Rounded corners */
+    -fx-border-color: #ecf0f1; /* Light border */
+    -fx-border-width: 2;
+    -fx-padding: 10px; /* Inner padding */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5); /* Subtle shadow */
+}
+
+/* Style for the title */
+.hero-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0a0a0a; /* Reddish title color */
+    -fx-padding: 0 0 5px 0; /* Space below title */
+}
+
+/* Style for stat labels and values */
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #ecf0f1; /* Light text for contrast */
+    -fx-font-weight: bold;
+}
+
+.stat-value {
+    -fx-font-size: 12px;
+    -fx-text-fill: #2ecc71; /* Green for values */
+    -fx-padding: 0 0 5px 10px; /* Space below and indent */
+}
+
+/* Highlight key stats (e.g., Level, HP) */
+.key-stat {
+    -fx-font-size: 14px;
+    -fx-text-fill: #f1c40f; /* Yellow for emphasis */
+}
+
+/* Hover effect for interactivity */
+.hero-info:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 15, 0, 0, 5); /* Darker shadow on hover */
+}

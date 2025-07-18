@@ -8,7 +8,7 @@ import swingy.model.Map;
 import swingy.view.console.ConsoleMap;
 import swingy.view.console.ConsoleMenu;
 import swingy.view.console.HeroMenu;
-import swingy.view.console.MenuAction;
+import swingy.controller.GameStateManager;
 
 public class CLIView extends View{
 	private ConsoleMenu console;
@@ -22,7 +22,7 @@ public class CLIView extends View{
 	}
 
 	@Override
-	public void MenuDisplay(){
+	public void MenuDisplay(GameStateManager stateManager){
 		InputManager.setContext(console);
 		console.menu();
 		InputManager.startInputLoop();

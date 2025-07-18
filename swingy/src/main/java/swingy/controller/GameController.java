@@ -1,9 +1,11 @@
 package swingy.controller;
 
+import javafx.application.Platform;
 import swingy.model.Hero;
 import swingy.model.Map;
+import swingy.view.MenuAction;
 import swingy.view.View;
-import swingy.view.console.MenuAction;
+import swingy.view.gui.GUIMenu;
 
 public class GameController implements InputContext{
 	public boolean isRunning;
@@ -12,70 +14,87 @@ public class GameController implements InputContext{
 	private Map map;
 	private View view;
 	private View secondView;
-	//private Scanner scanner;
+    private GameState state;
+    private GUIMenu guiMenu;
+    public GameStateManager stateManager = new GameStateManager();
 
 	public GameController(View view, View secondView){
 		this.view = view;
 		this.secondView = secondView;
 		this.isRunning = true;
 		this.pauseLoop = true;
-		//this.scanner = new Scanner(System.in);
+        this.state = GameState.MENU;
 	}
 
 	public void gameloop(){
-        GameState state = GameState.MENU;
-
-        while (state != GameState.EXIT) {
+        while (stateManager.getState() != GameState.EXIT) {
+            state = stateManager.getState();
+            //System.out.println(state);
             switch (state) {
                 case MENU:
-                    view.MenuDisplay();
+                    view.MenuDisplay(stateManager);
                     MenuAction choice = view.getMenuChoice();
                     if (choice == MenuAction.NEW_GAME) {
-                        state = GameState.CREATE_HERO;
+                        stateManager.setState(GameState.CREATE_HERO);
                     } else if (choice == MenuAction.LOAD_SAVE) {
-                        state = GameState.LOAD_SAVE;
+                        stateManager.setState(GameState.LOAD_SAVE);
                     } else if (choice == MenuAction.QUIT) {
-                        state = GameState.EXIT;
+                        stateManager.setState(GameState.EXIT);
                     }
                     break;
     
                 case CREATE_HERO:
-                    hero = view.createHero(); //this needs to have a inputmanager thing same as the menudisplay
+                    hero = view.createHero();
                     if (hero != null) {
                         map = new Map(hero);
-                        state = GameState.MAP;
+                        stateManager.setState(GameState.MAP);
                     } else {
-                        state = GameState.MENU; // Go back to menu if hero creation fails
+                        stateManager.setState(GameState.MENU); // Go back to menu if hero creation fails
                     }
                     break;
     
                 case LOAD_SAVE:
                     hero = view.selectSave();
                     if (hero != null) {
+                        System.out.println("here");
                         map = new Map(hero);
-                        state = GameState.MAP;
+                        stateManager.setState(GameState.MAP);
                     } else {
-                        state = GameState.MENU; // Go back to menu if loading fails
+                        stateManager.setState(GameState.MENU); // Go back to menu if loading fails
                     }
                     break;
     
                 case MAP:
+                    //System.out.println(state);
                     view.MapDisplay(map, hero); // Display the map and hero state
                     String input = view.getMoveInput(); // Handle movement input
                      if (processMovement(input)) {
                          //state = GameState.EXIT; // Hero wins by reaching the map edge
                      }
                     break;
-    
+                case DIED:
+                     //game over screen thingy
+                     break;
+                case EXIT:
+                     handleExit();
                 default:
-                    state = GameState.EXIT;
+                    stateManager.setState(GameState.EXIT);;
             }
         }
         System.out.println("Thanks for playing!");
     }
 
+    private void handleExit(){
+        isRunning = false;
+        Platform.exit();
+        System.exit(0);
+    }
+
     private boolean processMovement(String input) {
         String direction;
+        if (input.equals("quit")){
+            quit();
+        }
         switch (input) {
             case "w": direction = "north"; break;
             case "s": direction = "south"; break;
@@ -86,15 +105,33 @@ public class GameController implements InputContext{
                 return false;
         }
         
-        boolean reachedEdge = map.moveHero(direction);
-        if (reachedEdge) {
-            map.generateNewMap();
-        }
+        boolean reachedEdge = map.moveHero(direction, false);
+        // if (reachedEdge) {
+        //     map.generateNewMap();
+        // }
         return reachedEdge;
     }
     
+    public void handleMenuAction(MenuAction action) {
+        switch (action) {
+            case NEW_GAME:
+                stateManager.setState(GameState.CREATE_HERO);
+                break;
+            case LOAD_SAVE:
+                stateManager.setState(GameState.LOAD_SAVE);
+                break;
+            case QUIT:
+                stateManager.setState(GameState.EXIT);
+                break;
+            default:
+                break;
+        }
+    }
+
 	private void quit() {
+        hero.saveHero();
         System.out.println("Quitting the game...");
+        stateManager.setState(GameState.EXIT);
         this.isRunning = false; // Ends the game loop
     }
 

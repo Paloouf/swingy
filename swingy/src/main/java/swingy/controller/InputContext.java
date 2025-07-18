@@ -1,6 +1,6 @@
 package swingy.controller;
 
-import swingy.view.console.MenuAction;
+import swingy.view.MenuAction;
 
 public interface InputContext {
     /**

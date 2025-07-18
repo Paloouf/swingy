@@ -1,13 +1,12 @@
 package swingy.controller;
 
-import java.util.Scanner;
+import java.io.IOException;
+
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp;
 
-import swingy.view.console.MenuAction;
-
-import java.io.IOException;
+import swingy.view.MenuAction;
 
 public class InputManager {
     private static InputContext currentContext;

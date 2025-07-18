@@ -12,26 +12,6 @@ public class InputValidator {
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 
-	public static <T> void validateInput(T input, Class<UserInputDTO<T>> dtoClass, String... groups) {
-		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-		UserInputDTO<T> tempDTO = null;
-		try {
-			tempDTO = dtoClass.getDeclaredConstructor().newInstance();
-			tempDTO.setInput(input);
-		} catch (Exception e) {
-			throw new RuntimeException("Error creating DTO instance for validation.", e);
-		}
-
-		Set<ConstraintViolation<UserInputDTO<T>>> violations = validator.validate(tempDTO);
-		if (!violations.isEmpty()) {
-			StringBuilder errorMessage = new StringBuilder("Validation errors:\n");
-			for (ConstraintViolation<UserInputDTO<T>> violation : violations) {
-				errorMessage.append(violation.getMessage()).append("\n");
-			}
-			throw new IllegalArgumentException(errorMessage.toString());
-		}
-	}
-
     public static String validateStringInput(String input) {
         UserInputDTO<String> dto = new UserInputDTO<>();
         dto.setStringInput(input);
@@ -45,7 +25,7 @@ public class InputValidator {
                 System.out.println(violation.getMessage());
             }
         }
-        return null; // Or handle as needed
+        return null;
     }
 
 	public static Integer validateIntegerInput(Integer input) {
@@ -61,6 +41,6 @@ public class InputValidator {
                 System.out.println(violation.getMessage());
             }
         }
-        return null; // Or handle as needed
+        return null;
     }
 }
