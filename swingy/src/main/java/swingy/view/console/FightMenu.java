@@ -98,7 +98,7 @@ public class FightMenu {
 				// Check if enemy is defeated
 				if (enemy.getHealth() <= 0) {
 					System.out.println("The " + enemy.getName() + " has been defeated!");
-					int xpAward = (int) Math.pow(enemy.getLevel(), 2) * 300;
+					int xpAward = hero.getXpReward(enemy);
 					hero.gainExperience(xpAward);
 					hero.heal();
 					Artifact loot = LootSystem.rollForLoot(); // to implement 

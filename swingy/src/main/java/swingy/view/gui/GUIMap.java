@@ -29,7 +29,6 @@ public class GUIMap {
 
 	//to update after fights
 	private VBox heroInfo;
-	private Label levelLabel, levelValue;
 	private Label gearLabel, gearValue;
 	private Label statsLabel;
 	private VBox statsBox;
@@ -61,7 +60,15 @@ public class GUIMap {
 		} else {
 			updateHeroInfo(hero); // Update existing heroInfo
 		}
-		mainContent.setTop(heroInfo);
+		// Button backButton = new Button("Back to Menu");
+		// backButton.getStyleClass().add("back-button"); // Optional CSS class
+		// backButton.setOnAction(e -> {
+		// 	app.returnToMainMenu(); // Switch to main menu scene
+		// });
+		
+		HBox topContent = new HBox(10, heroInfo); // 10px spacing
+		topContent.setAlignment(Pos.CENTER); // Align hero info to left, back button to right
+		mainContent.setTop(topContent);
 
 		// Center: Map + Controls side-by-side	
 		mapGrid = createMapGrid(map, hero, 10);
@@ -152,14 +159,6 @@ public class GUIMap {
 		title.getStyleClass().add("hero-title");
 		heroInfo.getChildren().add(title);
 
-		// Level
-		levelLabel = new Label("Level:"); // Class field
-		levelLabel.getStyleClass().add("stat-label");
-		levelValue = new Label(String.valueOf(hero.getLevel())); // Class field
-		levelValue.getStyleClass().add("stat-value key-stat");
-		HBox levelBox = new HBox(levelLabel, levelValue);
-		heroInfo.getChildren().add(levelBox);
-
 		// Gear
 		gearLabel = new Label("Gear:"); // Class field
 		gearLabel.getStyleClass().add("stat-label");
@@ -174,9 +173,9 @@ public class GUIMap {
 		statsBox = new VBox(2); // Class field
 		statsBox.getChildren().addAll(
 			createStatRow("Name:", hero.getName(), "Class:", hero.getClassName()),
-			createStatRow("Level:", String.valueOf(hero.getLevel()), "Experience:", String.valueOf(hero.getExperience())),
+			createStatRow("Level:", String.valueOf(hero.getLevel()), "Experience:", String.valueOf(hero.getExperience()+"/"+hero.getNextLevelXP())),
 			createStatRow("Attack:", String.valueOf(hero.getAttackPower()), "Defense:", String.valueOf(hero.getDefense())),
-			createStatRow("HP:", String.valueOf(hero.getHealth()), "", "")
+			createStatRow("HP:", String.valueOf(hero.getMaxHealth()), "", "")
 		);
 		statsBox.getChildren().forEach(node -> {
 			if (node instanceof HBox) {
@@ -191,6 +190,14 @@ public class GUIMap {
 			}
 		});
 		heroInfo.getChildren().add(statsBox);
+
+		// Back Button (optional: wrap in HBox for alignment)
+		Button backButton = new Button("Back to Menu");
+		backButton.getStyleClass().add("back-button");
+		backButton.setOnAction(e -> app.returnToMainMenu());
+		HBox buttonBox = new HBox(backButton);
+		buttonBox.setAlignment(Pos.CENTER_RIGHT); // Align button to the right
+		heroInfo.getChildren().add(buttonBox);
 
 		return heroInfo;
 	}
@@ -213,16 +220,15 @@ public class GUIMap {
 	public void updateHeroInfo(Hero hero) {
 		if (heroInfo == null) return; // Ensure heroInfo is initialized
 
-		levelValue.setText(String.valueOf(hero.getLevel()));
 		gearValue.setText(hero.getFormattedGear());
 		
 		// Update stats box
 		statsBox.getChildren().clear();
 		statsBox.getChildren().addAll(
 			createStatRow("Name:", hero.getName(), "Class:", hero.getClassName()),
-			createStatRow("Level:", String.valueOf(hero.getLevel()), "Experience:", String.valueOf(hero.getExperience())),
+			createStatRow("Level:", String.valueOf(hero.getLevel()), "Experience:", String.valueOf(hero.getExperience()+"/"+hero.getNextLevelXP())),
 			createStatRow("Attack:", String.valueOf(hero.getAttackPower()), "Defense:", String.valueOf(hero.getDefense())),
-			createStatRow("HP:", String.valueOf(hero.getHealth()), "", "")
+			createStatRow("HP:", String.valueOf(hero.getMaxHealth()), "", "")
 		);
 		statsBox.getChildren().forEach(node -> {
 			if (node instanceof HBox) {

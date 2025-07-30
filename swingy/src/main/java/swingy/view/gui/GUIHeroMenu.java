@@ -88,7 +88,9 @@ public class GUIHeroMenu{
         if (saves.isEmpty()) {
             System.out.println("No saved heroes found!");
 			Label noSavesLabel = new Label("No saved heroes found!");
-			layout.getChildren().add(noSavesLabel);
+			Button backButton = new Button("Back to Main Menu");
+			backButton.setOnAction(e -> app.returnToMainMenu());
+			layout.getChildren().addAll(noSavesLabel, backButton);
 			app.primaryStage.setScene(this.scene);
 			app.primaryStage.show();
 			return null;

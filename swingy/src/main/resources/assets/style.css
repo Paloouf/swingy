@@ -77,3 +77,15 @@
 .hero-info:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 15, 0, 0, 5); /* Darker shadow on hover */
 }
+
+.back-button {
+    -fx-background-color: #e74c3c; /* Red background */
+    -fx-text-fill: white; /* White text */
+    -fx-font-size: 12px;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 5;
+}
+
+.back-button:hover {
+    -fx-background-color: #c0392b; /* Darker red on hover */
+}

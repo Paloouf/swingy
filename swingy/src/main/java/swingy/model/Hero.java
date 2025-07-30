@@ -41,7 +41,7 @@ public class Hero {
         this.equippedArtifacts = new HashMap<>();
 	}
 
-    public void equipArtifact(Artifact newArtifact){
+    public boolean equipArtifact(Artifact newArtifact){
         ArtifactType type = newArtifact.getType();
         Artifact current = equippedArtifacts.get(type);
 
@@ -55,8 +55,10 @@ public class Hero {
             equippedArtifacts.put(type, newArtifact);
             applyArtifactBonus(newArtifact);
             System.out.println("Equipped better " + type + " artifact: " + newArtifact.getBonusValue());
+            return true;
         } else {
             System.out.println("Kept current " + type + " artifact, new one was weaker.");
+            return false;
         }
     }
 
@@ -64,7 +66,7 @@ public class Hero {
         switch (artifact.getType()) {
             case WEAPON -> attack += artifact.getBonusValue();
             case BODY -> defense += artifact.getBonusValue();
-            case HELMET -> hitPoints += artifact.getBonusValue();
+            case HELMET -> baseHP += artifact.getBonusValue();
         }
     }
 
@@ -79,7 +81,7 @@ public class Hero {
         switch (artifact.getType()) {
             case WEAPON -> attack -= artifact.getBonusValue();
             case BODY -> defense -= artifact.getBonusValue();
-            case HELMET -> hitPoints -= artifact.getBonusValue();
+            case HELMET -> baseHP -= artifact.getBonusValue();
         }
     }
 
@@ -123,6 +125,11 @@ public class Hero {
 
     public String getGear(){
         return equippedArtifacts.toString();
+    }
+
+    public int getXpReward(Enemy enemy){
+        int xp = (int) (enemy.getLevel() * 100 * (1 + Math.log10(level+1)));
+        return xp;
     }
 
 	public int getNextLevelXP() {
@@ -253,6 +260,7 @@ public class Hero {
         json.append("\"level\":").append(level).append(",");
         json.append("\"experience\":").append(experience).append(",");
         json.append("\"hitPoints\":").append(hitPoints).append(",");
+        json.append("\"baseHP\":").append(baseHP).append(",");
         json.append("\"attack\":").append(attack).append(",");
         json.append("\"defense\":").append(defense).append(",");
         json.append("\"gold\":").append(gold).append(",");
@@ -280,6 +288,7 @@ public class Hero {
         int level = Integer.parseInt(json.split("\"level\":")[1].split(",")[0]);
         int experience = Integer.parseInt(json.split("\"experience\":")[1].split(",")[0]);
         int hitPoints = Integer.parseInt(json.split("\"hitPoints\":")[1].split(",")[0]);
+        int baseHP = Integer.parseInt(json.split("\"baseHP\":")[1].split(",")[0]);
         int attack = Integer.parseInt(json.split("\"attack\":")[1].split(",")[0]);
         int defense = Integer.parseInt(json.split("\"defense\":")[1].split(",")[0]);
         int gold = Integer.parseInt(json.split("\"gold\":")[1].split(",")[0]);
@@ -296,6 +305,7 @@ public class Hero {
         hero.level = level;
         hero.experience = experience;
         hero.hitPoints = hitPoints;
+        hero.baseHP = baseHP;
         hero.attack = attack;
         hero.defense = defense;
         hero.gold = gold;
