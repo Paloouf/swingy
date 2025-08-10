@@ -9,7 +9,7 @@ public class UserInputDTO<T> {
 	@Max(value = 9)
 	private Integer integerInput;
 
-    @Size(min = 1, max = 50, message = "Input length must be between 1 and 50.")
+    @Size(min = 1, max = 12, message = "Input length must be between 1 and 12.")
     private String stringInput; // Only used for text validation
 
 	public Integer getIntegerInput(){

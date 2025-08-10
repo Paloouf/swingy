@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import swingy.controller.InputContext;
 import swingy.controller.InputValidator;
+import swingy.controller.JsonParser;
 import swingy.model.Hero;
 import swingy.model.HeroClass;
 import swingy.view.MenuAction;
@@ -44,19 +45,31 @@ public class HeroMenu implements InputContext{
 	public Hero createHero() {
         Scanner scanner = new Scanner(System.in);
         clearScreen();
-        //System.out.println("Enter your hero's name:");
-        //String input = scanner.nextLine();
-        String name;// = InputValidator.validateStringInput(input); //problem tidingtiding engine kaput
-        while (true) {
-            System.out.print("Enter your hero's name:");
-            String input = scanner.nextLine();
 
-            name = InputValidator.validateStringInput(input);
-            if (name != null) {
-                System.out.println("Valid input: " + name);
-                break;
+        final String[] nameHolder = new String[1]; // Final array, mutable content
+        while (true) {
+            System.out.print("Enter your hero's name: ");
+            String input = scanner.nextLine();
+            nameHolder[0] = InputValidator.validateStringInput(input);
+            if (nameHolder[0] != null) {
+                List<Path> saves = getSaveFiles();
+                boolean nameExists = saves.stream()
+                    .map(path -> path.getFileName().toString().replace(".json", ""))
+                    .anyMatch(existingName -> existingName.equalsIgnoreCase(nameHolder[0]));
+
+                if (nameExists) {
+                    System.out.print("A hero with the name '" + nameHolder[0] + "' already exists! Do you want to overwrite it? (yes/no): ");
+                    String overwrite = scanner.nextLine().trim().toLowerCase();
+                    if (!overwrite.equals("yes")) {
+                        continue;
+                    }
+                }
+                break; // Valid and unique name, or confirmed overwrite
             }
         }
+
+        String name = nameHolder[0];
+        
         HeroClass selectedClass = selectHeroClass();
 
         Hero newHero = new Hero(name, selectedClass);
@@ -66,27 +79,118 @@ public class HeroMenu implements InputContext{
 
     public Hero selectSave() {
         clearScreen();
-
+    
         List<Path> saves = getSaveFiles();
         if (saves.isEmpty()) {
             System.out.println("No saved heroes found!");
             return null;
         }
-
+    
         System.out.println("Select a saved hero:");
         for (int i = 0; i < saves.size(); i++) {
-            System.out.printf("[%d] %s\n", i + 1, saves.get(i).getFileName().toString());
+            try {
+                // Read JSON file as string
+                String json = Files.readString(saves.get(i));
+                // Parse JSON manually
+                JsonParser.JsonStats stats = JsonParser.parseJsonStats(json);
+    
+                if (stats != null) {
+                    // Remove .json extension from file name
+                    String fileName = saves.get(i).getFileName().toString().replace(".json", "");
+    
+                    // Display with stats
+                    System.out.printf(
+                        "[%d] %s (%s, Level: %d, HP: %d, Attack: %d, Defense: %d)\n",
+                        i + 1,
+                        fileName,
+                        stats.className,
+                        stats.level,
+                        stats.health,
+                        stats.attackPower,
+                        stats.defense
+                    );
+                } else {
+                    System.out.printf("[%d] %s (Error parsing hero data)\n", i + 1, saves.get(i).getFileName());
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading file " + saves.get(i).getFileName() + ": " + e.getMessage());
+                System.out.printf("[%d] %s (Error loading hero data)\n", i + 1, saves.get(i).getFileName());
+            }
         }
-
+    
         Scanner scanner = new Scanner(System.in);
         int choice = -1;
         while (choice < 1 || choice > saves.size()) {
             System.out.print("Enter a number: ");
-            choice = scanner.nextInt();
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+            } else {
+                scanner.next(); // Clear invalid input
+                continue;
+            }
         }
-
-        return loadHero(saves.get(choice - 1));
+    
+        return loadHero(saves.get(choice - 1)); // Full load only for the selected hero
     }
+    
+    // private static class JsonStats {
+    //     String className;
+    //     int level;
+    //     int health;
+    //     int attackPower;
+    //     int defense;
+    
+    //     JsonStats(String className, int level, int health, int attackPower, int defense) {
+    //         this.className = className;
+    //         this.level = level;
+    //         this.health = health;
+    //         this.attackPower = attackPower;
+    //         this.defense = defense;
+    //     }
+    // }
+    
+    // private JsonStats parseJsonStats(String json) {
+    //     try {
+    //         // Find start of JSON object
+    //         int start = json.indexOf('{');
+    //         int end = json.lastIndexOf('}');
+    //         if (start == -1 || end == -1 || start >= end) return null;
+    
+    //         String content = json.substring(start + 1, end).trim();
+    //         String[] pairs = content.split(",(?=\\s*[^\\s]*\\s*:)");
+    
+    //         String className = "Unknown";
+    //         int level = 0, health = 0, attackPower = 0, defense = 0;
+    
+    //         for (String pair : pairs) {
+    //             pair = pair.trim();
+    //             if (pair.startsWith("\"heroClass\"")) {
+    //                 className = extractValue(pair).replace("\"", "");
+    //             } else if (pair.startsWith("\"level\"")) {
+    //                 level = Integer.parseInt(extractValue(pair));
+    //             } else if (pair.startsWith("\"baseHP\"")) {
+    //                 health = Integer.parseInt(extractValue(pair));
+    //             } else if (pair.startsWith("\"attack\"")) {
+    //                 attackPower = Integer.parseInt(extractValue(pair));
+    //             } else if (pair.startsWith("\"defense\"")) {
+    //                 defense = Integer.parseInt(extractValue(pair));
+    //             }
+    //         }
+    
+    //         return new JsonStats(className, level, health, attackPower, defense);
+    //     } catch (Exception e) {
+    //         System.err.println("Failed to parse JSON: " + e.getMessage());
+    //         return null;
+    //     }
+    // }
+    
+    // private String extractValue(String pair) {
+    //     int colonIndex = pair.indexOf(':');
+    //     if (colonIndex != -1) {
+    //         return pair.substring(colonIndex + 1).trim();
+    //     }
+    //     return "";
+    // }
 
     private Hero loadHero(Path saveFile) {
         try {

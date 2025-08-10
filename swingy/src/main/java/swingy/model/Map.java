@@ -37,7 +37,7 @@ public class Map {
     // Generate enemies and place them on the map
     public void generateMap() {
         Random rand = new Random();
-        int numberOfEnemies = size; // Example value
+        int numberOfEnemies = size * 2; // Example value
         for (int i = 0; i < numberOfEnemies; i++) {
             int x, y;
             do {
@@ -54,7 +54,7 @@ public class Map {
         // Reset all values in the enemies array to false
         enemies = new boolean[size][size];
         grid = new char[size][size];
-        int numberOfEnemies = size; // Example value
+        int numberOfEnemies = size *2; // Example value
         hero.setX(size/2);
         hero.setY(size/2);
         for (int i = 0; i < numberOfEnemies; i++) {
@@ -114,13 +114,11 @@ public class Map {
         
 
         if (grid[hero.getX()][hero.getY()] == 'V') {
-            System.out.println("You've encountered something!"); //gui crashes here
             if (!gui){
                 FightMenu fightMenu = new FightMenu();
                 fightMenu.initiateFight(hero);
             }
             else {
-                System.out.println("enemy gui ok");
                 if (encounterListener != null) {
                     encounterListener.onEnemyEncountered(hero); // Notify listener
                 }

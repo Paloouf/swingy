@@ -6,15 +6,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import swingy.controller.InputValidator;
+import swingy.controller.JsonParser;
 import swingy.model.Hero;
 import swingy.model.HeroClass;
 
@@ -57,12 +63,33 @@ public class GUIHeroMenu{
 
 		// Add event handler for hero creation
 		createHeroButton.setOnAction(e -> {
-			String name = heroNameField.getText();
+			String inputName = heroNameField.getText().trim();
+			String name = InputValidator.validateStringInput(inputName);
 			String selectedClass = heroClassComboBox.getValue();
 
 			if (name == null || name.isEmpty() || selectedClass == null) {
 				System.out.println("Please fill out all fields.");
 				return;
+			}
+
+			// Check if name already exists
+			List<Path> saves = getSaveFiles();
+			boolean nameExists = saves.stream()
+				.map(path -> path.getFileName().toString().replace(".json", ""))
+				.anyMatch(existingName -> existingName.equalsIgnoreCase(name));
+
+			if (nameExists) {
+				// Show confirmation dialog for overwrite
+				Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+				alert.setTitle("Name Conflict");
+				alert.setHeaderText("A hero with the name '" + name + "' already exists!");
+				alert.setContentText("Do you want to overwrite it?");
+
+				Optional<ButtonType> result = alert.showAndWait();
+				if (result.isPresent() && result.get() != ButtonType.OK) {
+					return; // Cancel overwrite
+				}
+				// Proceed to overwrite if OK is clicked
 			}
 
 			HeroClass heroClass = HeroClass.valueOf(selectedClass.toUpperCase());
@@ -98,7 +125,20 @@ public class GUIHeroMenu{
 
 		ComboBox<String> heroClassComboBox = new ComboBox<>();
 		for (Path save : saves) {
-			heroClassComboBox.getItems().add(save.getFileName().toString().replace(".json", ""));
+			try {
+				String json = Files.readString(save);
+				JsonParser.JsonStats stats = JsonParser.parseJsonStats(json);
+				if (stats != null) {
+					String fileName = save.getFileName().toString().replace(".json", "");
+					heroClassComboBox.getItems().add(String.format("%s ( %s, Level: %d, HP: %d, Attack: %d, Defense: %d)",
+						fileName, stats.className, stats.level, stats.health, stats.attackPower, stats.defense));
+				} else {
+					heroClassComboBox.getItems().add(save.getFileName().toString().replace(".json", "") + " (Error parsing data)");
+				}
+			} catch (IOException e) {
+				System.err.println("Error reading file " + save.getFileName() + ": " + e.getMessage());
+				heroClassComboBox.getItems().add(save.getFileName().toString().replace(".json", "") + " (Error loading data)");
+			}
 		}
 		heroClassComboBox.setPromptText("Select a Hero");
 

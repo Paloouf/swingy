@@ -154,7 +154,7 @@ public class GameController implements InputContext{
                 quit();
                 return MenuAction.QUIT; // Exit application
             default:
-                System.out.println("Invalid game command.");
+                System.out.println("");
         }
         return MenuAction.NONE; // Continue application
     }
