@@ -17,7 +17,7 @@ public class ConsoleMap {
        int startX = heroX - HALF_WINDOW; // Center hero at position 4
        int startY = heroY - HALF_WINDOW;
 
-       // Display the fixed 9x9 window with '+' for out-of-bounds
+       // Display the fixed 15*15 window with '+' for out-of-bounds
        for (int i = 0; i < WINDOW_SIZE; i++) {
            for (int j = 0; j < WINDOW_SIZE; j++) {
                int mapX = startY + j; // Map x-coordinate
@@ -35,25 +35,13 @@ public class ConsoleMap {
         displayControls();
     }
 
-	// public void displayMap(Map map, Hero hero) {
-    //     clearScreen();
-    //     char[][] grid = map.getGrid();
-    //     for (int i = 0; i < grid.length; i++) {
-    //         for (int j = 0; j < grid[i].length; j++) {
-    //             System.out.print(grid[i][j] + " ");
-    //         }
-    //         System.out.println();
-    //     }
-    //     displayHeroInfo(hero);
-    //     displayControls();
-    // }
-
     private void displayHeroInfo(Hero hero) {
-        System.out.println("Hero: " + hero.getName() + " | Level: " + hero.getLevel() + " | HP: " + hero.getHealth() + " | Att: " + hero.getAttackPower() + " | XP: " + hero.getExperience() + "/" + hero.getNextLevelXP());
+        System.out.println("Hero: " + hero.getName() + " | Level: " + hero.getLevel() + " | HP: " + hero.getHealth() + " | Att: " + hero.getAttackPower() + "| Def: "+ hero.getDefense() + "| XP: " + hero.getExperience() + "/" + hero.getNextLevelXP());
+        System.out.println("Gear: " + hero.getFormattedGear());
     }
 
     private void displayControls() {
-        System.out.println("Controls: North (w), South (s), East (d), West (a), Quit (quit)");
+        System.out.println("Controls: North (w), South (s), East (d), West (a), MainMenu (back), Quit (quit)");
     }
 
     private void clearScreen() {

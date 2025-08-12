@@ -3,6 +3,9 @@ package swingy.view.console;
 import java.util.Random;
 import java.util.Scanner;
 
+import swingy.controller.GameController;
+import swingy.controller.GameState;
+import swingy.controller.GameStateManager;
 import swingy.controller.InputValidator;
 import swingy.model.Artifact;
 import swingy.model.Enemy;
@@ -111,7 +114,10 @@ public class FightMenu {
 				// Check if hero is defeated
 				if (hero.getHealth() <= 0) {
 					System.out.println("You have been defeated. Game Over!");
+					hero.saveHero();
+					gameOver();
 					inCombat = false; // Exit the combat loop
+					
 				}
 
 			} catch (InterruptedException e) {
@@ -122,6 +128,29 @@ public class FightMenu {
 		}
 
 		System.out.println("--- Combat Ends ---");
+	}
+
+	private void gameOver(){
+		System.out.print("\033[H\033[2J");
+        System.out.flush();
+		System.out.println("=========================================");
+		System.out.println("         G A M E   O V E R                ");
+		System.out.println("=========================================");
+		System.out.println("    💀 Your journey has ended! 💀       ");
+		System.out.println("=========================================");
+		try {
+			Thread.sleep(1000); // 1-second pause
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt(); // Restore interrupted status
+		}
+
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Press Enter to return to the main menu...");
+		scanner.nextLine();
+
+		GameStateManager.getInstance().setState(GameState.MENU);
+		
+
 	}
 
 }

@@ -16,7 +16,7 @@ public class GameController implements InputContext{
 	private View secondView;
     private GameState state;
     private GUIMenu guiMenu;
-    public GameStateManager stateManager = new GameStateManager();
+    public GameStateManager stateManager;
 
 	public GameController(View view, View secondView){
 		this.view = view;
@@ -24,6 +24,7 @@ public class GameController implements InputContext{
 		this.isRunning = true;
 		this.pauseLoop = true;
         this.state = GameState.MENU;
+        stateManager = GameStateManager.getInstance();
 	}
 
 	public void gameloop(){
@@ -56,7 +57,6 @@ public class GameController implements InputContext{
                 case LOAD_SAVE:
                     hero = view.selectSave();
                     if (hero != null) {
-                        System.out.println("here");
                         map = new Map(hero);
                         stateManager.setState(GameState.MAP);
                     } else {
@@ -65,7 +65,6 @@ public class GameController implements InputContext{
                     break;
     
                 case MAP:
-                    //System.out.println(state);
                     view.MapDisplay(map, hero); // Display the map and hero state
                     String input = view.getMoveInput(); // Handle movement input
                      if (processMovement(input)) {
@@ -95,13 +94,16 @@ public class GameController implements InputContext{
         if (input.equals("quit")){
             quit();
         }
+        if (input.equals("back")){
+            GameStateManager.getInstance().setState(GameState.MENU);
+        }
         switch (input) {
             case "w": direction = "north"; break;
             case "s": direction = "south"; break;
             case "a": direction = "west";  break;
             case "d": direction = "east";  break;
             default:
-                System.out.println("Invalid input!");
+                System.out.println("");
                 return false;
         }
         
